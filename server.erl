@@ -20,6 +20,24 @@ stop() ->
 		Msg ->
 		    Msg
 	    end
+    end,
+    case whereis(parken) of
+	undefined ->
+	    already_stopped;
+	_  ->
+	    parken ! stop
+    end,
+    case whereis(sticky) of
+	undefined ->
+	    already_stopped;
+	_  ->
+	    sticky ! stop
+    end,
+    case whereis(jazzhuset) of
+	undefined ->
+	    already_stopped;
+	_  ->
+	    jazzhuset ! stop
     end.
 
 launch() ->
@@ -60,7 +78,7 @@ loop() ->
 	    loop();
 	{update, Pid} ->
 	    Pid ! {ok, updated},
-	    loop();
+	    ?MODULE:loop();
 	{'EXIT', Pid, normal} ->
 	    io:format("normal exit ~p~n", [Pid]),
 	    loop();

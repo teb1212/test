@@ -24,6 +24,7 @@ get_info() ->
 
     init_m1(Event),
     init_m2(Event),
+%    inets:stop(),
     srv ! {done, self()},
     loop().
 %

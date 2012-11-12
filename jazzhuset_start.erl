@@ -34,7 +34,7 @@ set_start([_H|T], Event) -> set_start(T, Event);
 set_start([], _Event) ->
 
 %Tomasz
-    
+%    inets:stop(),
     srv ! {done, self()}.
 
 

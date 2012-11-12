@@ -32,7 +32,7 @@ get_link([_H|T], Event) -> get_link(T, Event);
 get_link([], _Event) -> 
 
 %Tomasz
-
+%    inets:stop(),
     srv ! {done, self()}.
 
 
