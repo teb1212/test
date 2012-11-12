@@ -2,6 +2,15 @@
 -export([get_info/0]).
 
 get_info() ->
+
+%Tomasz
+    
+    try register(jazzhuset, self())
+    catch
+	error:badarg ->
+	    ok
+    end,
+
     inets:start(),
     {ok, {{_Version, 200, _ReasonPhrase}, _Headers, Body}} =
 	httpc:request("http://www.jazzhuset.se/"),
@@ -11,7 +20,11 @@ get_info() ->
     Date = [],
     Picture = [],
     Event = [Name, Description, Time, Date, Picture],
-    set_start(Body, Event).
+    set_start(Body, Event),
+
+%Tomasz
+
+    loop().
 
 
 set_start([$", $k, $o, $m, $m, $a, $n, $d, $e, $e, $v, $e, $n, $t, $"|T],
@@ -19,6 +32,9 @@ set_start([$", $k, $o, $m, $m, $a, $n, $d, $e, $e, $v, $e, $n, $t, $"|T],
     get_link(T, Event);
 set_start([_H|T], Event) -> set_start(T, Event);
 set_start([], _Event) ->
+
+%Tomasz
+    
     srv ! {done, self()}.
 
 
@@ -37,3 +53,17 @@ take_link([$"|T], List, Event) ->
 take_link([H|T], List, Event) ->
     take_link(T, [H|List], Event).
 
+%Tomasz
+
+loop() ->
+    receive
+	{ok, _Pid} ->
+	    io:format("confirmation received~n"),
+	    loop();
+	stop ->
+%	    srv ! {'EXIT', whereis(jazzhuset), shutdown},
+	    ok
+    after 300000 ->
+	    get_info(),
+	    loop()
+    end.
