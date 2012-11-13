@@ -1,15 +1,17 @@
 -module(sprps).
 -compile(export_all).
 
-calculate() ->
+get_info() ->
     {Y, M, D} = erlang:date(),
-    work({Y, M, D}, 0, []).
+    work({Y, M, D}, 0, []),
+    loop().
 
 work({_, _, _}, 30, List) ->
 
     lists:reverse(List),
 %OUTPUT, PASS TO DB
-    io:format("~p~n", [List]);
+    io:format("~p~n", [List]),
+    srv ! {done, self()};
 
 work({Y, 13, _D}, Acc, List) ->
     work({Y+1, 1, 1}, Acc+1, List);
@@ -23,6 +25,7 @@ work({Y, M, D}, Acc, List) ->
 	    case calendar:day_of_the_week(Y, M, D) of
 		5 ->
 %INPUT AREA FOR FIXED WEEKDAYS, NUMBERS REPRESENT WEEKDAYS
+
 		    List2 = List ++ [["Bistrot"], ["Lindholmen"], 
 				     ["After Work"], ["After Work @ Bistrot YAY"], 
 				     ["16:00"], [Y, M, D], []];
@@ -33,3 +36,16 @@ work({Y, M, D}, Acc, List) ->
 	    work({Y, M, D+1}, Acc+1, List2)
     end,
     ok.
+
+
+loop() ->
+    receive
+	{ok, _Pid} ->
+	    io:format("confirmation received~n"),
+	    loop();
+	stop ->
+	    ok
+    after 300000 ->
+	    get_info(),
+	    loop()
+    end.

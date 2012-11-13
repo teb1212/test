@@ -4,14 +4,6 @@
 
 get_info() ->
 
-%Tomasz
-
-    try register(parken, self())
-    catch
-	error:badarg ->
-	    ok
-    end,
-%
     inets:start(),
     Name = [],
     Description = [],

@@ -3,14 +3,6 @@
 
 get_info() ->
 
-%Tomasz
-
-    try register(sticky, self())
-    catch
-	error:badarg ->
-	    ok
-    end,
-
     inets:start(),
     {ok, {{_Version, 200, _ReasonPhrase}, _Headers, Body}} =
 	httpc:request("http://www.stickyfingers.nu/"),
