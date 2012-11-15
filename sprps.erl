@@ -11,6 +11,7 @@ work({_, _, _}, 30, List) ->
     lists:reverse(List),
 %OUTPUT, PASS TO DB
     io:format("~p~n", [List]),
+%Dennis module    db:start(List),
     srv ! {done, self()};
 
 work({Y, 13, _D}, Acc, List) ->
@@ -25,10 +26,22 @@ work({Y, M, D}, Acc, List) ->
 	    case calendar:day_of_the_week(Y, M, D) of
 		5 ->
 %INPUT AREA FOR FIXED WEEKDAYS, NUMBERS REPRESENT WEEKDAYS
-
-		    List2 = List ++ [["Bistrot"], ["Lindholmen"], 
-				     ["After Work"], ["After Work @ Bistrot YAY"], 
-				     ["16:00"], [Y, M, D], []];
+		    Place = "Bistrot",
+		    Address = "Lindholmen",
+		    Name = "After Work",
+		    Descr = "After Work @ Bistrot YAY",
+		    Time = "16:00",
+		    Date = {Y, M, D},
+		    Pic = [],
+		    List2 = List ++ [Place, Address, 
+				     Name, Descr, 
+				     Time, Date, Pic];
+		6 ->
+		    List2 = List,
+		    ok;
+		7 ->
+		    List2 = List,
+		    ok;
 		_ ->
 		    List2 = List,
 		    ok

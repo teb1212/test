@@ -2,7 +2,8 @@
 -compile(export_all).
 
 start() ->
-    Pid = spawn(?MODULE, init, []),
+    List = [parser_parken_start, sticky_start, jazzhuset_start, sprps],
+    Pid = spawn(?MODULE, init, [List]),
     try register(srv, Pid)
     catch
 	error:badarg ->
@@ -13,7 +14,7 @@ start() ->
 stop() ->
     case whereis(srv) of
 	undefined ->
-	    already_stopped;
+	    io:format("Already stopped!~n");
 	_ ->
 	    srv ! {stop, self()},
 	    receive
@@ -21,34 +22,24 @@ stop() ->
 		    Msg
 	    end
     end,
-    stop_prc(),
+    stopp(),
     tercon().
 
-stop_prc() ->
-    case whereis(parser_parken_start) of
-	undefined ->
-	    already_stopped;
-	_  ->
-	    parser_parken_start ! stop
-    end,
-    case whereis(sticky_start) of
-	undefined ->
-	    already_stopped;
-	_  ->
-	    sticky_start ! stop
-    end,
-    case whereis(jazzhuset_start) of
-	undefined ->
-	    already_stopped;
-	_  ->
-	    jazzhuset_start ! stop
-    end,
-    case whereis(sprps) of
+stopp() ->
+    List = [parser_parken_start, sticky_start, jazzhuset_start, sprps],
+    stopp(List).
+
+stopp([]) ->
+    ok;
+stopp([H|T]) ->
+    %erlang:demonitor(H),
+    case whereis(H) of
 	undefined ->
 	    already_stopped;
 	_ ->
-	    sprps ! stop
-    end.
+	    H ! stop
+    end,
+    stopp(T).
 
 launch() ->
     case whereis(srv) of
@@ -74,41 +65,42 @@ update() ->
 	    Msg
     end.
 
-init() ->
+init(List) ->
     process_flag(trap_exit, true),
-    loop().
+    loop(List).
 
-loop() ->
+loop(List) ->
     receive
 	{stop, Pid} ->
 	    Pid ! stopped;
 	{fire, Pid} ->
 	    Pid ! {ok, started},
-	    tasker(),
-	    loop();
+	    tasker(List),
+	    loop(List);
 	{done, Pid} ->
 	    Pid ! {ok, self()},
-	    loop();
+	    loop(List);
 	{update, Pid} ->
 	    Pid ! {ok, updated},
-	    ?MODULE:loop();
+	    ?MODULE:loop(List);
 	{'EXIT', Pid, normal} ->
 	    io:format("normal exit ~p~n", [Pid]),
-	    loop();
+	    loop(List);
+%Not sure if shutdown exit is necessary
 	{'EXIT', Pid, shutdown} ->
 	    io:format("shutdown exit ~p~n", [Pid]),
-	    loop();
+	    loop(List);
 	{'EXIT', Pid, Reason} ->
 	    io:format("~p crashed feck~n", [Pid]),
 	    io:format("Reason: ~p~n", [Reason]),
-	    loop();
+	    loop(List);
 	{'DOWN', Ref, process, {Name, Node}, Info} ->
 	    io:format("~p~n", [[Ref, {Name, Node}, Info]]),
 	    mini_tasker(Name),
-	    loop()
+	    loop(List)
     after 900000 ->
 	    self() ! {fire, self()},
-	    loop()
+	    loop(List)
     end.
 
 mini_tasker(Name) ->
@@ -116,35 +108,16 @@ mini_tasker(Name) ->
     register(Name, Pid),
     erlang:monitor(process, Name).
 
-tasker() ->
-    Pid = spawn_link(fun() -> parser_parken_start:get_info() end),
-    try register(parser_parken_start, Pid)
+tasker([]) ->
+    ok;
+tasker([H|T]) ->
+    Pid = spawn_link(fun() -> H:get_info() end),
+    try register(H, Pid)
     catch
 	error:badarg ->
 	    Pid ! stop
     end,
-    erlang:monitor(process, parser_parken_start),
-    Pid2 = spawn_link(fun() -> jazzhuset_start:get_info() end),
-    try register(jazzhuset_start, Pid2)
-    catch
-	error:badarg ->
-	    Pid2 ! stop
-    end,
-    erlang:monitor(process, jazzhuset_start),
-    Pid3 = spawn_link(fun() -> sticky_start:get_info() end),
-    try register(sticky_start, Pid3)
-    catch
-	error:badarg ->
-	    Pid3 ! stop
-    end,
-    erlang:monitor(process, sticky_start),
-    Pid4 = spawn_link(fun() -> sprps:get_info() end),
-    try register(sprps, Pid4)
-    catch
-	error:badarg ->
-	    Pid4 ! stop
-    end,
-    erlang:monitor(process, sprps).
+    erlang:monitor(process, H),
+    tasker(T).
 
-
-    
+  
