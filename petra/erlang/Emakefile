@@ -1,0 +1,2 @@
+{"parser_pr_start", [debug_info, {i, "include/"}, {outdir, "ebin/"}]}.
+{"parser_simple", [debug_info, {i, "include/"}, {outdir, "ebin/"}]}.
