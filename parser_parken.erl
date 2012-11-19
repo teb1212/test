@@ -19,7 +19,8 @@ check_text([_H|T], Event) -> check_text(T, Event);
 check_text([], [H1, H2, H3, H4|H5]) -> 
        Place = "Parken",
        Adress = "Vasagatan 43 5218 Göteborg",
-      _Finalevent = [Place, Adress, H1, H2, H3, H4, H5],
+       Finalevent = [Place, Adress, H1, H2, H3, H4, H5],
+       db:start(Finalevent),
        io:format("~s~n", [Place]).
           
 
