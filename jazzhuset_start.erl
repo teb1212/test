@@ -1,6 +1,9 @@
 -module(jazzhuset_start).
 -export([get_info/0]).
 
+%%% Internal functions, Tomasz
+-export([makeref/0, loop/0]).
+
 get_info() ->
 
     inets:start(),
@@ -13,10 +16,12 @@ get_info() ->
     Picture = [],
     Event = [Name, Description, Time, Date, Picture],
     set_start(Body, Event),
-
-%Tomasz
-
     loop().
+
+%% Creates the unique reference for the parser, only used by the server
+makeref() ->
+    make_ref().
+
 
 
 set_start([$", $k, $o, $m, $m, $a, $n, $d, $e, $e, $v, $e, $n, $t, $"|T],
@@ -25,8 +30,6 @@ set_start([$", $k, $o, $m, $m, $a, $n, $d, $e, $e, $v, $e, $n, $t, $"|T],
 set_start([_H|T], Event) -> set_start(T, Event);
 set_start([], _Event) ->
 
-%Tomasz
-%    inets:stop(),
     srv ! {done, self()}.
 
 
@@ -45,15 +48,16 @@ take_link([$"|T], List, Event) ->
 take_link([H|T], List, Event) ->
     take_link(T, [H|List], Event).
 
-%Tomasz
 
+%% @author Tomasz Rakalski
+%% The function for the process part, waits for messages from the server and
+%% runs the process again after 5 mins (after timeout).
 loop() ->
     receive
 	{ok, _Pid} ->
 	    io:format("confirmation received~n"),
 	    loop();
 	stop ->
-%	    srv ! {'EXIT', whereis(jazzhuset), shutdown},
 	    ok
     after 300000 ->
 	    get_info(),

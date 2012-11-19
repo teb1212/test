@@ -1,5 +1,9 @@
 -module(sticky_start).
--compile(export_all).
+
+-export([get_info/0]).
+
+%%% Internal functions, Tomasz
+-export([makeref/0, loop/0]).
 
 get_info() ->
 
@@ -13,18 +17,17 @@ get_info() ->
     Picture = [],
     Event = [Name, Description, Time, Date, Picture],
     get_link(Body, Event),
-
-%Tomasz
-    
     loop().
+
+%% Creates the unique reference for the parser, only used by the server
+makeref() ->
+    make_ref().
 
 get_link([$d, $", $>, $<, $a, $ , $h, $r, $e, $f, $=, $"|T], Event) ->
     take_link(T,[],Event)   ;
 get_link([_H|T], Event) -> get_link(T, Event);
 get_link([], _Event) -> 
 
-%Tomasz
-%    inets:stop(),
     srv ! {done, self()}.
 
 
@@ -37,15 +40,15 @@ take_link([$"|T], List, Event) ->
 take_link([H|T], List, Event) ->
     take_link(T, [H|List], Event).
 
-%Tomasz
-
+%% @author Tomasz Rakalski
+%% The function for the process part, waits for messages from the server and
+%% runs the process again after 5 mins (after timeout).
 loop() ->
     receive
 	{ok, _Pid} ->
 	    io:format("confirmation received~n"),
 	    loop();
 	stop ->
-%	    srv ! {'EXIT', whereis(sticky), shutdown},
 	    ok
     after 300000 ->
 	    get_info(),
