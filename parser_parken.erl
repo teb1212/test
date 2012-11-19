@@ -36,6 +36,16 @@ take_time([H1, H2, H3, H4, H5|T1], [Name, Description, Time|T2]) ->
 
 description_h4([$<, $/|T1], List, [Name, Description|T2]) -> 
    check_text(T1,  [Name, [Description|[List|"\n"]]|T2]);
+description_h4([_H, H1|T], List, Event) when H1 == 165 ->
+    description_h4(T, [229|List], Event);
+description_h4([_H, H1|T], List, Event) when H1 == 164 ->
+    description_h4(T,[228|List], Event);
+description_h4([_H, H1|T], List, Event) when H1 == 182 ->
+    description_h4(T, [246|List], Event);
+description_h4([_H, H1|T], List, Event) when H1 == 160 ->
+    description_h4(T, [32|List], Event);
+description_h4([_H, H1|T], List, Event) when H1 == 169 ->
+    description_h4(T,[233|List], Event);
 description_h4([H|T], List, Event) -> 
     description_h4(T, [H|List], Event).
 
@@ -66,6 +76,16 @@ take_description_div([$<,$/|T], [H2|T2], [Name, Description|T3])  ->
 
 take_description_div([$<,$e,$m,$>|T], List, Event) ->
     take_description_div(T, List, Event);
+take_description_div([_H, H1|T], List, Event) when H1 == 165 ->
+    take_description_div(T, [229|List], Event);
+take_description_div([_H, H1|T], List, Event) when H1 == 164 ->
+    take_description_div(T,[228|List], Event);
+take_description_div([_H, H1|T], List, Event) when H1 == 182 ->
+    take_description_div(T, [246|List], Event);
+take_description_div([_H, H1|T], List, Event) when H1 == 160 ->
+    take_description_div(T, [32|List], Event);
+take_description_div([_H, H1|T], List, Event) when H1 == 169 ->
+    take_description_div(T,[233|List], Event);
 take_description_div([H|T], List, Event) ->
     take_description_div(T, [H|List], Event).
 
@@ -75,6 +95,16 @@ take_description_p([$<, $b, $r|T], List, Event) ->
     description_p(T, [Space|List], Event);
 take_description_p([$<|T], List, Event) ->
     description_p([$<|T], List, Event); 
+take_description_p([_H, H1|T], List, Event) when H1 == 165 ->
+    take_description_p(T, [229|List], Event);
+take_description_p([_H, H1|T], List, Event) when H1 == 164 ->
+    take_description_p(T,[228|List], Event);
+take_description_p([_H, H1|T], List, Event) when H1 == 182 ->
+    take_description_p(T, [246|List], Event);
+take_description_p([_H, H1|T], List, Event) when H1 == 160 ->
+    take_description_p(T, [32|List], Event);
+take_description_p([_H, H1|T], List, Event) when H1 == 169 ->
+    take_description_p(T,[233|List], Event);
 take_description_p([H|T], List, Event) -> 
     take_description_p(T, [H|List], Event).
     
