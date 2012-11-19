@@ -57,12 +57,13 @@ work({Y, M, D}, Acc, List) ->
 		    Name = "After Work",
 		    Descr = "After Work @ Bistrot YAY",
 		    Time = "16:00",
-		    Date = {Y, M, D},
+		    Date = [integer_to_list(Y), $-, integer_to_list(M), $-, 
+			    integer_to_list(D)],
 		    Pic = [],
 		    List2 = List ++ [Place, Address, 
 				     Name, Descr, 
-				     Time, Date, Pic],
-		    %DB saving
+				     Time, Date, Pic]
+		    DB saving
 		    List3 = [Place, Address, Name, Descr, Time, Date, Pic],
 		    db:start(List3);
 		
