@@ -63,9 +63,9 @@ work({Y, M, D}, Acc, List) ->
 		    List2 = List ++ [Place, Address, 
 				     Name, Descr, 
 				     Time, Date, Pic]
-		    DB saving
-		    List3 = [Place, Address, Name, Descr, Time, Date, Pic],
-		    db:start(List3);
+		    %DB saving
+		    List3 = [Place, Address, Name, Descr, Time, Date, Pic];
+		    %db:start(List3);
 		
 		% Saturday
 		6 ->

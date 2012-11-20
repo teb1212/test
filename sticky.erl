@@ -12,7 +12,7 @@ check_text([], [H1, H2, H3, H4|H5]) ->
        Place = "Sticky Fingers",
        Adress = "Kaserntorget 7 41118 Göteborg",
        Finalevent = [Place, Adress, H1, H2, H3, H4, H5],
-       db:start(Finalevent),
+       %db:start(Finalevent),
        io:format("~s~n", [Place]).
 
 

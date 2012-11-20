@@ -1,0 +1,21 @@
+description_h4([H, H1|T], List, Event) when H1 == 165 ->
+description_h4(T, [229|List], Event);
+description_h4([H, H1|T], List, Event) when H1 == 164 ->
+description_h4(T,[228|List], Event);
+description_h4([H, H1|T], List, Event) when H1 == 182 ->
+description_h4(T, [246|List], Event);
+description_h4([H, H1|T], List, Event) when H1 == 160 ->
+description_h4(T, [32|List], Event);
+description_h4([H, H1|T], List, Event) when H1 == 169 ->
+description_h4(T,[233|List], Event);
+
+take_description_p([H, H1|T], List, Event) when H1 == 165 ->
+take_description_p(T, [229|List], Event);
+take_description_p([H, H1|T], List, Event) when H1 == 164 ->
+take_description_p(T,[228|List], Event);
+take_description_p([H, H1|T], List, Event) when H1 == 182 ->
+take_description_p(T, [246|List], Event);
+take_description_p([H, H1|T], List, Event) when H1 == 160 ->
+take_description_p(T, [32|List], Event);
+take_description_p([H, H1|T], List, Event) when H1 == 169 ->
+take_description_p(T,[233|List], Event);
