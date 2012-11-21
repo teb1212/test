@@ -62,7 +62,7 @@ work({Y, M, D}, Acc, List) ->
 		    Pic = [],
 		    List2 = List ++ [Place, Address, 
 				     Name, Descr, 
-				     Time, Date, Pic]
+				     Time, Date, Pic],
 		    %DB saving
 		    List3 = [Place, Address, Name, Descr, Time, Date, Pic];
 		    %db:start(List3);
