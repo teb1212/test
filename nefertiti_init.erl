@@ -26,6 +26,7 @@ get_info() ->
     Event = [Name, Description, Tid, Datum, Picture],
     initialize1(Event),
     initialize2(Event),
+    srv ! {done, self()},
     loop().
 
 %% Creates the unique reference for the parser, only used by the server
