@@ -21,7 +21,8 @@ find_links([$K, $o, $m, $m, $a, $n, $d, $e|T], Event) -> find_link(T, Event);
 find_links([_H|T], Event) ->
     find_links(T, Event).
 
-find_link([$T, $i, $d, $i, $g, $a, $r, $e|_T], _Event) -> ok;
+find_link([$T, $i, $d, $i, $g, $a, $r, $e|_T], _Event) -> 
+    srv ! {done, self()};
 find_link([$h, $r, $e, $f, $=, $\"|T], Event) -> get_link(T,[],Event);
 find_link([_H|T], Event) ->
     find_link(T, Event).
