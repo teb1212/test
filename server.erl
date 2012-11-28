@@ -19,7 +19,7 @@
 %% Launches the server, List contains the names of the parsers
 start() ->
     List = [parken_start, sticky_start, jazzhuset_start, sprps, 
-	    nefertiti_init, parser_pr_start],
+	    nefertiti_init, parser_pr_start, peacock_start],
     Pid = spawn(?MODULE, init, [List]),
     try register(srv, Pid)
     catch
@@ -56,7 +56,8 @@ stopp() ->
 	    {jazzhuset_start, jazzhuset_start:makeref()}, 
 	    {sprps, sprps:makeref()}, 
 	    {nefertiti_init, nefertiti_init:makeref()},
-	    {parser_pr_start, parser_pr_start:makeref()}],
+	    {parser_pr_start, parser_pr_start:makeref()},
+	    {peacock_start, peacock_start:makeref()}],
 
     stopp(List).
 
