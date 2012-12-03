@@ -11,7 +11,7 @@
 -module(sprps).
 
 %%% External function
--export([get_info/0]).
+-export([get_info/0, update/0]).
 
 %%% Internal functions
 -export([makeref/0, work/2, loop/0]).
@@ -25,6 +25,13 @@ get_info() ->
 %% Creates the unique reference for the parser, only used by the server
 makeref() ->
     make_ref().
+
+update() ->
+    sprps ! {update, self()},
+    receive
+	Msg ->
+	    Msg
+    end.
 
 %% Internal calculations and functionality of the parser, calculates 30 days forward
 %% and sends the information to the db module. 
@@ -145,6 +152,9 @@ loop() ->
 	{ok, _Pid} ->
 	    io:format("confirmation received~n"),
 	    loop();
+	{update, Pid} ->
+	    Pid ! {ok, updated},
+	    ?MODULE:loop();
 	stop ->
 	    ok
     after 300000 ->
