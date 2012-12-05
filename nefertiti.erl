@@ -28,7 +28,7 @@ check_text([$<,$/,$d,$l,$>|_T], [H1, H2, H3, H4|H5]) ->
     Place = "Nefertiti Jazz Club",
     Adress = "Hvitfeldtsplatsen 6411 20 Göteborg.",
     Finalevent = [Place, Adress, H1, H2, H3, H4, H5],
-    %db:start(Finalevent);
+    db:start(Finalevent),
     %io:format("~s~n",[H4])
        io:format("~s~n", [H4]);
 check_text([_H|T], Event) -> check_text(T, Event). 
@@ -85,7 +85,7 @@ take_tid([H|T], List, Event) ->   take_tid(T, [H|List], Event).
 
 %% Locate the picture of the event and put it in a list
 take_pic([$"|T], List, [Name, Description, Tid, Datum|_Picture]) -> 
-    NewPicture = "www.nefertiti.se/img/p" ++ lists:reverse(List),
+    NewPicture = "http://www.nefertiti.se/img/p" ++ lists:reverse(List),
     check_text(T, [Name, Description, Tid, Datum, NewPicture]);
 %take_pic([_H, 165|T], List, Event) ->
 %    take_pic(T, [229|List], Event);

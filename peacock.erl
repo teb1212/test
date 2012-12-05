@@ -12,13 +12,10 @@ check_text([], [H1,H2,H3,H4,H5]) ->
     Place = "Peacock",
     Address = "Kungsportsavenyn 21, 411 36 Göteborg",
     NewH4 = take_datum(H4),
-    _Finalevent = [Place, Address, H1,H2,H3,NewH4,H5],
-    %db:start(Finalevent),
-    %io:format("~s~n" , [H1]),
-    %io:format("~s~n" , [H2]),
-    %io:format("~s~n" , [H3]),
-    %io:format("~s~n" , [NewH4]),
-    io:format("~s~n", [Place]).
+    NewH1 = format_name(H1, []),
+   Finalevent = [Place, Address, NewH1,H2,H3,NewH4,H5],
+    db:start(Finalevent),
+    io:format("~s~n" , [NewH1]).
 
 
 
@@ -38,6 +35,8 @@ take_description_p([$<|T], List,Event) ->
     description_p([$<|T], List,Event); 
 take_description_p([$&, $n, $b, $s, $p, $;|T], List, Event)  -> 
     take_description_p(T, [$&|List], Event);
+take_description_p([$&, $a, $m, $p, $;|T], List, Event) -> 
+    take_description_p(T, [$&|List], Event);
 take_description_p([_H, H1|T], List, Event) when H1 == 165 -> 
     take_description_p(T, [229|List], Event);
 take_description_p([_H, H1|T], List, Event) when H1 == 164 -> 
@@ -53,14 +52,20 @@ take_description_p([H|T], List,Event) ->
 
 
 get_name([$<, $/, $h, $1, $>|T], List, [_Name|T2]) ->
+
     check_text(T, [lists:reverse(List)|T2]);
 get_name([H|T], List, Event) -> get_name(T, [H|List], Event).
 
+format_name([$&, $a, $m, $p, $;|T], List) -> format_name(T, [$&|List]);
+format_name([H|T], List) -> format_name(T , [H|List]);
+format_name([], List) -> lists:reverse(List). 
+    
 find_pic([$s, $r, $c, $=, $\"|T], Event) -> get_pic(T,[],Event);
 find_pic([_H|T], Event) -> find_pic(T, Event).
 
 get_pic([$\"|T], List, [Name, Description, Time, Date, Picture]) ->
-    check_text(T, [Name, Description, Time, Date,[lists:reverse(List)|Picture]]);
+    check_text(T, [Name, Description, Time, Date,
+                         [lists:reverse(List)|Picture]]);
 
 get_pic([H|T],List,Event) -> get_pic(T, [H|List], Event);
 get_pic([], _List, _Event) -> ok. 

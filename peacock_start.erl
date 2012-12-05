@@ -53,4 +53,3 @@ loop() ->
 	    get_info(),
 	    loop()
     end.
-

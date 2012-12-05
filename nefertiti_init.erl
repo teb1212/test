@@ -55,7 +55,7 @@ take_link([$"|T], List, Event) ->
     NewLink = lists:reverse(List),
     {ok, {{_Version1, 200, _ReasonPhrase1}, _Headers, Body}} =
 	httpc:request("http://nefertiti.se" ++ NewLink),
-    nefertiti:check_text(Body, Event),
+        nefertiti:check_text(Body, Event),
     get_link(T, Event);
 
 take_link([H|T], List, Event) -> 
@@ -75,4 +75,3 @@ loop() ->
 	    get_info(),
 	    loop()
     end.
-

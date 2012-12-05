@@ -31,7 +31,7 @@ check_text([], [H1, H2, H3, H4|H5]) ->
        Place = "Jazzhuset",
        Adress = "Erik Dahlbergsgatan 3 41126 Göteborg",
        Finalevent = [Place, Adress, H1, H2, H3, H4, H5],
-       %db:start(Finalevent),
+       db:start(Finalevent),
        io:format("~s~n", [H1]).
 
 %% Function takes source code which starts from the required information 

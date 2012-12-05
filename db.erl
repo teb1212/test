@@ -17,22 +17,27 @@
 -define(PWD, "machete@1991").
 -define(ConnectStr, "DSN=mysql;UID=machete;PWD=machete@1991").
 
+
 start([Place, _Address, Name, Desc, _Time, Date, Img_url]) ->
-%start()->
-    % Start a new ODBC server. The application must already be started.
+
+
+  %   Start a new ODBC server. The application must already be started.
      odbc:start(),
                                         
     % Connect to the database.
-    {ok,Ref}  = odbc:connect(?ConnectStr,[]),
+   {ok,Ref}  = odbc:connect(?ConnectStr,[]),
 
     
 % We are quering a wordpress database so we use the wp_tables to have compatibility with the worpress.
 % That's why sometimes like this query that follows I have add additional fields which we don't use 
 % the wordpress is using 
-%Img_url_string = "<img class=""alignright"" title="++Place++" src="++Img_url++" width="126" height="252" />",
-%Img_url_string = "<img class=""alignright"" title=""Parkeb"" src=""'"++Img_url++"'""alt="" width=""126"" height=""252""/>",
 
-Img_url_string  = "<img class= \"alignright\"  title=\""++Place++"\" src=\""++Img_url++"\" alt=\"\""" width=\"126\" height=\"180\" />",
+
+Post_excerpt = "<img class= \"alignright\"  title=\""++Place++"\" src=\""++Img_url++"\" alt=\"\""" width=\"126\" height=\"180\" /> "++word_count(320,Desc)++"...click the title for more",
+
+
+
+Img_url_string  = "<img class= \"alignright\"  title=\""++Place++"\" src=\""++Img_url++"\" alt=\"\""" width=\"126\" height=\"180\" /> " ,
 	
 	Insert_query = "INSERT INTO wp_posts (
 	post_author,
@@ -65,7 +70,7 @@ Img_url_string  = "<img class= \"alignright\"  title=\""++Place++"\" src=\""++Im
 	'2012-11-01 22:05:53', 
 	'"++Img_url_string++Desc++"',
 	'"++Name++"', 
-	'"" ',
+	'"++Post_excerpt++" ',
 	'publish', 
 	'open', 
 	'open',
@@ -90,14 +95,16 @@ Img_url_string  = "<img class= \"alignright\"  title=\""++Place++"\" src=\""++Im
 	%% I first query the database with a unique compination of the event arguments to see if it has already saved.
 	%% If not then I insert th new event to the database
 
-    SelectStmt = "SELECT id FROM wp_posts WHERE post_title='"++Name++"' AND place = '"++Place++"' AND custom_date ='"++Date++"'",
+    SelectStmt = "SELECT id FROM wp_posts WHERE post_title='"++Name++"'AND place = '"++Place++"'AND custom_date ='"++Date++"'",
  	 Sql1 = odbc:sql_query(Ref, SelectStmt),
     io:format("execute_stmt Select statement returns ~p~n",
              [Sql1]),
 		case Sql1 of 
-    			Sql1 = {selected,["id"],[]}->
+   			Sql1 = {selected,["id"],[]}->
 				_Sql3  = odbc:sql_query(Ref, Insert_query);
 			Sql1 = {selected,["id"],[_R]} ->
+				io:format("Already exists");
+			Sql1 = {selected,["id"],[_R],[_W]} ->
 				io:format("Already exists")
 			end,  
  
@@ -108,3 +115,22 @@ Img_url_string  = "<img class= \"alignright\"  title=\""++Place++"\" src=\""++Im
 	
 	% Stop the server
 	odbc:stop(). 
+
+%empty string
+word_count(N,List)->
+word_count(N,List,[]).
+
+
+word_count(0,_,Small) -> reverse(Small);
+word_count(_N,[],Small) -> reverse(Small);
+%word_count(1,[_|[]],Small) -> word_count(0,[],Small);
+
+word_count(N,[22|List],Small)-> word_count(N-1,List,[32|Small]);
+word_count(N,[32|List],Small)-> word_count(N-1,List,[32|Small]);
+word_count(N,[10|List],Small)-> word_count(N-1,List,[32|Small]);
+word_count(N,[H|List],Small) -> word_count(N-1,List,[H|Small]).
+
+reverse([]) -> [];
+	reverse([H|T]) -> reverse(T)++[H].
+
+

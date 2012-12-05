@@ -18,13 +18,16 @@
 
 %% Launches the server, List contains the names of the parsers
 start() ->
-    List = [parken_start, sticky_start, jazzhuset_start, sprps, 
-	    nefertiti_init, parser_pr_start, peacock_start],
+%    List = [parken_start, sticky_start, jazzhuset_start, sprps,
+%nefertiti_init, parser_pr_start, peacock_start],
+List = [parken_start, sticky_start, jazzhuset_start, sprps,
+  nefertiti_init, peacock_start],
+
     Pid = spawn(?MODULE, init, [List]),
     try register(srv, Pid)
     catch
-	error:badarg ->
-	    Pid ! {stop, self()}
+error:badarg ->
+Pid ! {stop, self()}
     end,
     {ok, whereis(srv)}.
 
@@ -32,44 +35,52 @@ start() ->
 %% connection.
 stop() ->
     case whereis(srv) of
-	undefined ->
-	    io:format("Already stopped!~n");
-	_ ->
-	    srv ! {stop, self()},
-	    receive
-		Msg ->
-		    Msg
-	    end
+undefined ->
+io:format("Already stopped!~n");
+_ ->
+srv ! {stop, self()},
+receive
+Msg ->
+Msg
+end
     end,
     stopp(),
     tercon().
 
-%% Terminates the subparsers, List contains parser names as well as 
+%% Terminates the subparsers, List contains parser names as well as
 %% their references
 
 %% NEEDS REVISION FOR DEMONITOR !!!
 stopp() ->
-%    List = [parser_parken_start, sticky_start, jazzhuset_start, sprps],
+% List = [parser_parken_start, sticky_start, jazzhuset_start, sprps],
     
-    List = [{parken_start, parken_start:makeref()}, 
-	    {sticky_start, sticky_start:makeref()}, 
-	    {jazzhuset_start, jazzhuset_start:makeref()}, 
-	    {sprps, sprps:makeref()}, 
-	    {nefertiti_init, nefertiti_init:makeref()},
-	    {parser_pr_start, parser_pr_start:makeref()},
-	    {peacock_start, peacock_start:makeref()}],
+%    List = [{parken_start, parken_start:makeref()},
+%{sticky_start, sticky_start:makeref()},
+%{jazzhuset_start, jazzhuset_start:makeref()},
+%{sprps, sprps:makeref()},
+%{nefertiti_init, nefertiti_init:makeref()},
+%{parser_pr_start, parser_pr_start:makeref()},
+%{peacock_start, peacock_start:makeref()}],
+
+List =
+[{parken_start, parken_start:makeref()},
+{jazzhuset_start, parken_start:makeref()},
+{sticky_start, sticky_start:makeref()},
+{sprps, sprps:makeref()},
+{nefertiti_init, nefertiti_init:makeref()},
+{peacock_start, peacock_start:makeref()}],
 
     stopp(List).
 
 stopp([]) ->
     ok;
 stopp([{Name, _Ref}|T]) ->
-%    erlang:demonitor(Ref),
+% erlang:demonitor(Ref),
     case whereis(Name) of
-	undefined ->
-	    already_stopped;
-	_ ->
-	    Name ! stop
+undefined ->
+already_stopped;
+_ ->
+Name ! stop
     end,
     stopp(T).
 
@@ -77,14 +88,14 @@ stopp([{Name, _Ref}|T]) ->
 %% that spawn the parsers
 launch() ->
     case whereis(srv) of
-	undefined ->
-	    not_running;
-	_ ->
-	    srv ! {fire, self()},
-	    receive
-		Msg ->
-		    Msg
-	    end
+undefined ->
+not_running;
+_ ->
+srv ! {fire, self()},
+receive
+Msg ->
+Msg
+end
     end.
 
 %% Terminates the inets connection
@@ -95,8 +106,8 @@ tercon() ->
 update() ->
     srv ! {update, self()},
     receive
-	Msg ->
-	    Msg
+Msg ->
+Msg
     end.
 
 %% Initializes the event server loop (supervisor enabled)
@@ -112,36 +123,36 @@ init(List) ->
 %% the server will restart them.
 loop(List) ->
     receive
-	{stop, Pid} ->
-	    Pid ! stopped;
-	{fire, Pid} ->
-	    Pid ! {ok, started},
-	    tasker(List),
-	    loop(List);
-	{done, Pid} ->
-	    Pid ! {ok, self()},
-	    loop(List);
-	{update, Pid} ->
-	    Pid ! {ok, updated},
-	    ?MODULE:loop(List);
-	{'EXIT', Pid, normal} ->
-	    io:format("normal exit ~p~n", [Pid]),
-	    loop(List);
+{stop, Pid} ->
+Pid ! stopped;
+{fire, Pid} ->
+Pid ! {ok, started},
+tasker(List),
+loop(List);
+{done, Pid} ->
+Pid ! {ok, self()},
+loop(List);
+{update, Pid} ->
+Pid ! {ok, updated},
+?MODULE:loop(List);
+{'EXIT', Pid, normal} ->
+io:format("normal exit ~p~n", [Pid]),
+loop(List);
 %Not sure if shutdown exit is necessary
-	{'EXIT', Pid, shutdown} ->
-	    io:format("shutdown exit ~p~n", [Pid]),
-	    loop(List);
-	{'EXIT', Pid, Reason} ->
-	    io:format("~p crashed feck~n", [Pid]),
-	    io:format("Reason: ~p~n", [Reason]),
-	    loop(List);
-	{'DOWN', Ref, process, {Name, Node}, Info} ->
-	    io:format("~p~n", [[Ref, {Name, Node}, Info]]),
-	    mini_tasker(Name),
-	    loop(List)
+{'EXIT', Pid, shutdown} ->
+io:format("shutdown exit ~p~n", [Pid]),
+loop(List);
+{'EXIT', Pid, Reason} ->
+io:format("~p crashed feck~n", [Pid]),
+io:format("Reason: ~p~n", [Reason]),
+loop(List);
+{'DOWN', Ref, process, {Name, Node}, Info} ->
+io:format("~p~n", [[Ref, {Name, Node}, Info]]),
+mini_tasker(Name),
+loop(List)
     after 900000 ->
-	    self() ! {fire, self()},
-	    loop(List)
+self() ! {fire, self()},
+loop(List)
     end.
 
 %% This function is used to respawn a process that shut down.
@@ -158,10 +169,8 @@ tasker([H|T]) ->
     Pid = spawn_link(fun() -> H:get_info() end),
     try register(H, Pid)
     catch
-	error:badarg ->
-	    Pid ! stop
+error:badarg ->
+Pid ! stop
     end,
     erlang:monitor(process, H),
     tasker(T).
-
-  
