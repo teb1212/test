@@ -17,6 +17,11 @@
 -define(PWD, "machete@1991").
 -define(ConnectStr, "DSN=mysql;UID=machete;PWD=machete@1991").
 
+
+% This function starts the db_tags module. With method I start ODBC server, connected to db and make 
+% the necessary queries to create all the necessairy relationships between the posts(Events) and the place. 
+% These relationships are the link that allows us to make tags queries on the database.
+
 start([Place, Name, Date]) ->
 %start()->
     % Start a new ODBC server. The application must already be started.
@@ -25,9 +30,7 @@ start([Place, Name, Date]) ->
     % Connect to the database.
     {ok,Ref}  = odbc:connect(?ConnectStr,[]),	
     
-	% We are quering a wordpress database so we use the wp_tables to have compatibility with the worpress.
-	% That's why sometimes like this query that follows I have add additional fields which we don't use 
-	% the wordpress is using 
+	%% This query creates a different term for every different place that enters our database. 
 		
 	Insert_query = "INSERT INTO wp_terms (
 	name, 
@@ -36,12 +39,14 @@ start([Place, Name, Date]) ->
 	) VALUES (	
 	'"++Place++"',
 	'"++Place++"', 
-	0)",
+	1)",
 
 	
-	%% Since the parsers are always running we need an asynchronous check method to eliminate duplicates
-	%% I first query the database with ia unique compination of the event arguments to see if it has already saved.
-	%% If not then I insert th new event to the database
+	%% Since the parsers are always running we need an asynchronous check method to eliminate duplicates terms and relationships.
+	%% I first query the database with an unique combination of the event arguments to see if it has already saved.
+	%% If the relationship does not exists then I insert the new term and relationship to the database.
+	%% Tables wp_terms, wp_term_taxonomy contain all the term we are using.
+	%% Table wp_term_relationships contains all the relations we create.
 
     	SelectStmt = "SELECT name FROM wp_terms WHERE name='"++Place++"'",
     	Sql1 = odbc:sql_query(Ref, SelectStmt),
@@ -69,7 +74,9 @@ start([Place, Name, Date]) ->
 					'post_tag',
 					'Events that happen at "++Place++"'
 					)"),
-		
+
+		%% Check duplicate relationships and create new ones		
+
 		Select_3 = "SELECT id FROM wp_posts WHERE post_title='"++Name++"' AND custom_date = '"++Date++"' AND place ='"++Place++"'",
     		Sql6 = odbc:sql_query(Ref, Select_3),
     		io:format("Select_3 returns  ~p~n",[Sql6]),
