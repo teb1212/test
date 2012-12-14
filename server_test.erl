@@ -1,3 +1,12 @@
+%%%-------------------------------------------------------------------
+%%% @author Tomasz Rakalski
+%%% @copyright (C) 2012, Tomasz Rakalski
+%%% @doc
+%%% This module is described thoroughly in the design documentation
+%%% for the Machete project.
+%%% @end
+%%% Created : 14 Dec 2012 by tomkek <tomkek@TOMKEK-PC>
+%%%-------------------------------------------------------------------
 -module(server_test).
 -include_lib("eunit/include/eunit.hrl").
 

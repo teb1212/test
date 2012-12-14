@@ -46,10 +46,7 @@ stop() ->
 
 %% Terminates the subparsers, List contains parser names as well as 
 %% their references
-
-%% NEEDS REVISION FOR DEMONITOR !!!
 stopp() ->
-%    List = [parser_parken_start, sticky_start, jazzhuset_start, sprps],
     
     List = [{parken_start, parken_start:makeref()}, 
 	    {sticky_start, sticky_start:makeref()}, 
@@ -64,7 +61,6 @@ stopp() ->
 stopp([]) ->
     ok;
 stopp([{Name, _Ref}|T]) ->
-%    erlang:demonitor(Ref),
     case whereis(Name) of
 	undefined ->
 	    already_stopped;
@@ -108,7 +104,7 @@ init(List) ->
 %% as well as EXIT and DOWN messages used to monitor the processes.
 %% Tasker and mini_tasker are used in the server loop to spawn the processes.
 %% List contains the names of the parsers.
-%% A timeout of (______) is added so that in an event of all parsers terminating,
+%% A timeout of 12 hours is added so that in an event of all parsers terminating,
 %% the server will restart them.
 loop(List) ->
     receive
@@ -127,19 +123,18 @@ loop(List) ->
 	{'EXIT', Pid, normal} ->
 	    io:format("normal exit ~p~n", [Pid]),
 	    loop(List);
-%Not sure if shutdown exit is necessary
 	{'EXIT', Pid, shutdown} ->
 	    io:format("shutdown exit ~p~n", [Pid]),
 	    loop(List);
 	{'EXIT', Pid, Reason} ->
-	    io:format("~p crashed feck~n", [Pid]),
+	    io:format("~p abnormal exit ~n", [Pid]),
 	    io:format("Reason: ~p~n", [Reason]),
 	    loop(List);
 	{'DOWN', Ref, process, {Name, Node}, Info} ->
 	    io:format("~p~n", [[Ref, {Name, Node}, Info]]),
 	    mini_tasker(Name),
 	    loop(List)
-    after 900000 ->
+    after 4320000 ->
 	    self() ! {fire, self()},
 	    loop(List)
     end.

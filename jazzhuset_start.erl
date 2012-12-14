@@ -7,7 +7,7 @@
 
 %%% Internal functions, Tomasz
 -export([makeref/0, loop/0]).
-%%% // Tomasz
+
 
 %% starts the module, runs inets libraries for http requests, creates a 
 %% template for an Event, get the source code of a page (Body) and passes to
@@ -30,7 +30,6 @@ get_info() ->
 %% Creates the unique reference for the parser, only used by the server, Tomasz
 makeref() ->
     make_ref().
-%% // Tomasz
 
 %% Function searches for a place where it will start to look for links of
 %% events.
@@ -66,7 +65,7 @@ take_link([H|T], List, Event) ->
 
 %% @author Tomasz Rakalski
 %% The function for the process part, waits for messages from the server and
-%% runs the process again after 5 mins (after timeout).
+%% runs the process again after 6 hours (after timeout).
 loop() ->
     receive
 	{ok, _Pid} ->
@@ -74,7 +73,7 @@ loop() ->
 	    loop();
 	stop ->
 	    ok
-    after 300000 ->
+    after 2160000 ->
 	    get_info(),
 	    loop()
     end.

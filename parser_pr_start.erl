@@ -66,7 +66,7 @@ print([H1|T1], [H2|T2], [H3|T3], [H4|T4], [H5|T5],
 
 %% @author Tomasz Rakalski
 %% The function for the process part, waits for messages from the server and
-%% runs the process again after 5 mins (after timeout).
+%% runs the process again after 6 hours (after timeout).
 loop() ->
     receive
 	{ok, _Pid} ->
@@ -74,7 +74,7 @@ loop() ->
 	    loop();
 	stop ->
 	    ok
-    after 300000 ->
+    after 2160000 ->
 	    get_info(),
 	    loop()
     end.
